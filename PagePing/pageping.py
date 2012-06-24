@@ -3,10 +3,11 @@
 from subprocess import Popen, PIPE # for executing a process (in our case, ping.exe)
 import re # for matching the packets lost in a ping command
 import time
+import sys
 
 debug = True # toggle this to false if this is running in a production environment
 
-page = 'google.com'
+page = sys.argv[1]
 n = 1
 sleepTime = 60 # seconds
 
