@@ -29,8 +29,16 @@ class MyTaskBarIcon(wx.Frame):
         self.timer = wx.Timer(self)
         self.tbIcon = wx.TaskBarIcon()
 
-        icon = wx.Icon('TV.jpg', wx.BITMAP_TYPE_JPEG)
-        self.tbIcon.SetIcon(icon, 'Right click me!')
+        # icons...
+        # default:
+        self.iconDefault = wx.Icon('icon_pass.jpg', wx.BITMAP_TYPE_JPEG)
+        # good
+        self.iconSuccess = wx.Icon('icon_succeed.jpg', wx.BITMAP_TYPE_JPEG)
+        # bad
+        self.iconFail = wx.Icon('icon_fail.jpg', wx.BITMAP_TYPE_JPEG)
+
+        msg = 'Checking status of {0}...'.format(page)
+        self.tbIcon.SetIcon(self.iconDefault, msg)
 
         # event binidngs
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
@@ -53,7 +61,18 @@ class MyTaskBarIcon(wx.Frame):
 
         # find packets lost (typically either 0 or 100) and store the number in the first (and only) group (m.group(1))
         m = re.search("\((\d+)\% loss\)", out)
-        print m.group(1) # typically yields either 0 or 100
+        if m:
+            msg = None
+            if m.group(1) == '0':
+                msg = '{0} is available'.format(page)
+                self.tbIcon.SetIcon(self.iconSuccess, msg)
+            elif m.group(1) == '100':
+                msg = '{0} is down'.format(page)
+                self.tbIcon.SetIcon(self.iconFail, msg)
+            else:
+                msg = 'Checking status of {0}...'.format(page)
+                self.tbIcon.SetIcon(self.iconDefault, msg)
+
 
 app = wx.App(False)
 frame = MyTaskBarIcon(None)
