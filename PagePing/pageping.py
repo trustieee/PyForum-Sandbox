@@ -4,10 +4,9 @@
 import wx # for the taskbar icon (http://wxpython.org/download.php#stable)
 from subprocess import Popen, PIPE # for executing a process (in our case, ping.exe)
 import re # for matching the packets lost in a ping command
-from time import sleep
 import sys
 from os import path
-import time
+
 
 DEBUG = True # toggle this to false if this is running in a production environment
 
@@ -24,7 +23,7 @@ if DEBUG:
 
 class MyTaskBarIcon(wx.Frame):
     def __init__(self, parent):
-        wx.Frame.__init__(self, None)
+        wx.Frame.__init__(self, parent)
 
         # timer and taskbaricon
         self.timer = wx.Timer(self)
