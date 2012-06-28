@@ -5,7 +5,6 @@ import wx # for the taskbar icon (http://wxpython.org/download.php#stable)
 from subprocess import Popen, PIPE # for executing a process (in our case, ping.exe)
 import re # for matching the packets lost in a ping command
 import sys
-from os import path
 
 
 DEBUG = True # toggle this to false if this is running in a production environment
@@ -21,9 +20,9 @@ POLL_TIME = 60*1000 # seconds
 if DEBUG:
     POLL_TIME = 5*1000 # seconds
 
-class MyTaskBarIcon(wx.Frame):
-    def __init__(self, parent):
-        wx.Frame.__init__(self, parent)
+class MyTaskBarFrame(wx.Frame):
+    def __init__(self):
+        wx.Frame.__init__(self, None)
 
         # timer and taskbaricon
         self.timer = wx.Timer(self)
@@ -42,15 +41,15 @@ class MyTaskBarIcon(wx.Frame):
 
         # event binidngs
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
-        wx.EVT_TASKBAR_RIGHT_UP(self.tbIcon, self.OnTaskBarRight)
+        wx.EVT_TASKBAR_RIGHT_UP(self.tbIcon, self.OnTaskBarRightClick)
 
         self.timer.Start(POLL_TIME)
 
-    def OnTaskBarRight(self, evt):
-        """ Event handler for right clicking on the task bar icon """
-        self.timer.Stop()
-        self.tbIcon.RemoveIcon()
-        sys.exit()
+    def OnTaskBarRightClick(self, evt):
+        self.PopupMenu(self.CreatePopupMenu())
+
+    def OnExitMenuItemClicked(self, evt):
+        self.Shutdown()
 
     def OnTimer(self, evt):
         # ping 'page' 'n' times
@@ -73,10 +72,20 @@ class MyTaskBarIcon(wx.Frame):
                 msg = 'Checking status of {0}...'.format(page)
                 self.tbIcon.SetIcon(self.iconDefault, msg)
 
+    def CreatePopupMenu(self):
+        self.menu = wx.Menu()
+        exitMenuItem = self.menu.Append(wx.NewId(), "E&xit", "Exits the application.")
+        self.Bind(wx.EVT_MENU, self.OnExitMenuItemClicked, exitMenuItem)
+        return self.menu
+
+    def Shutdown(self):
+        self.timer.Stop()
+        self.tbIcon.RemoveIcon()
+        sys.exit()
+
 
 app = wx.App(False)
-frame = MyTaskBarIcon(None)
-frame.Show(False)
+frame = MyTaskBarFrame()
 app.MainLoop()
 
 
